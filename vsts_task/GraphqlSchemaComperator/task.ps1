@@ -32,9 +32,8 @@ try {
     & $comperator -o "$oldSchema" -n "$newSchema" -d "$schemaDiff" -s
 
     Write-Host "Compared the schemas and the diff is output to '$schemaDiff' "
-   
 
-    $result = Get-Content $schemaDiff | ConvertFrom-Json   #$schemaDiff
+    $result = Get-Content $schemaDiff | ConvertFrom-Json 
         
     if($result.IsIdentical) {
         Write-Host "The schemas were identical"
@@ -51,15 +50,15 @@ try {
             $attachment = $null
             foreach($change in $result.changes){
                 if($change.IsBreaking) {
-                    $attachment = New-SlackMessageAttachment -Color $([System.Drawing.Color]::Red) `
+                    $attachment = New-SlackMessageAttachment -Color '#FF0000' `
                         -Title "Breaking changes $($change.name): $($change.path)" `
                         -Text "$($change.message)" `
                         -Pretext  "" `
                         -Fallback "$($change.message)" `
                         -ExistingAttachment $attachment
                     
-                } elseif ($result.IsDangerous) {
-                    $attachment = New-SlackMessageAttachment -Color $([System.Drawing.Color]::Orange) `
+                } elseif ($change.IsDangerous) {
+                    $attachment = New-SlackMessageAttachment -Color '#FFa500' `
                                 -Title "Dangerous change $($change.name) : $($change.path)" `
                                 -Text "$($change.message)" `
                                 -Pretext "" `
@@ -67,7 +66,7 @@ try {
                                 -ExistingAttachment $attachment
                     
                 } else {
-                    $attachment = New-SlackMessageAttachment -Color  $([System.Drawing.Color]::Green) `
+                    $attachment = New-SlackMessageAttachment -Color '#00FF00' `
                         -Title "Safe change $($change.name): $($change.path)" `
                         -Text "$($change.message)" `
                         -Pretext  "" `
@@ -76,21 +75,22 @@ try {
                     
                 }
             }
-            # -AsUser -Username "$bootname"
-#$(Build.BuildUri)
-           $ignore = $attachment |
-                New-SlackMessage -Channel "$slackChannel" -Text "main message " -IconEmoji :bomb: -Username "$bootname" |
-                Send-SlackMessage -Token "$slackToken"
-           
-            #-IconUrl "https://camo.githubusercontent.com/07c5826102ecca3dbd33c0f848f82ec200ef7b6f/68747470733a2f2f73332d75732d776573742d322e616d617a6f6e6177732e636f6d2f737667706f726e2e636f6d2f6c6f676f732f6772617068716c2e737667"                
-           #$attachment | Send-SlackMessage -Token "$slackToken" `
-           #-IconEmoji :bomb:
-           
 
+            $mainMessage = "GraphQL API has some changes."
+            if($result.IsBreaking){
+                    $mainMessage = "At least one of the GraphQL API changes are breaking previous version."
+            } elseif($result.IsDangerous) {
+                $mainMessage = "At least one of the GraphQL API changes are dangerouscompared to previous version."
+            }
+            
+    
+            $ignore = $attachment |
+                New-SlackMessage -Channel "$slackChannel" -Text "$mainMessage" -IconEmoji :bomb: -Username "$bootname" |
+                Send-SlackMessage -Token "$slackToken"
+                      
             Write-Host "Slack integration finished"
         }else {
             Write-Host "Slack integration not configured"
-
         }
     }
 

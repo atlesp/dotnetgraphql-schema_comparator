@@ -332,3 +332,5 @@ ASALocalRun/
 
 
 /vsts_task/GraphqlSchemaComperator/comperator/**
+
+*.vsix

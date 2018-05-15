@@ -28,7 +28,7 @@ namespace schema_comparator
         {
             get
             {
-                return GetBreakingChanges().Count == 0;
+                return GetBreakingChanges().Count > 0;
             }
         }
 
@@ -37,16 +37,14 @@ namespace schema_comparator
         {
             get
             {
-                return GetDangerousChanges().Count == 0;
+                return GetDangerousChanges().Count > 0;
             }
         }
 
 
         public List<Change> GetBreakingChanges()
         {
-            
-                return this.changes.Where(c => c.IsBreaking).ToList();
-            
+            return this.changes.Where(c => c.IsBreaking).ToList();
         }
 
 
