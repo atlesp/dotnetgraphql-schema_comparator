@@ -2,4 +2,4 @@ language: csharp
 solution: dotnetgraphql-schema_comparator.sln
 install:
   - sudo apt-get install -y gtk-sharp2
-  - nuget dotnetgraphql-schema_comparator.sln
+  - nuget restore dotnetgraphql-schema_comparator.sln
