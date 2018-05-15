@@ -1,0 +1,77 @@
+{
+  "id": "17d8d3b0-535d-11e8-9ea7-4ba3e6dadb47",
+  "name": "GraphqlSchemaComperator",
+  "friendlyName": "GraphQL Schema Comperator",
+  "description": "Compares two graphql schemas",
+  "author": "Atle Esperum",
+  "helpMarkDown": "Replace with markdown to show in help",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "0",
+    "Minor": "9",
+    "Patch": "0"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "GraphqlSchemaComperator $(message)",
+  "inputs": [
+    {
+      "name": "cwd",
+      "type": "filePath",
+      "label": "Working Directory",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Current working directory when GraphqlSchemaComperator is run."
+    },
+    {
+      "name": "oldSchema",
+      "type": "string",
+      "label": "Path to the old schema",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The location of the file with the old schema"
+    },
+    {
+      "name": "newSchema",
+      "type": "string",
+      "label": "Path to the new schema",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The location of the file with the new schema that should be compared to the old"
+    },
+    {
+      "name": "schemaDiff",
+      "type": "string",
+      "label": "Path to the schema diff json output",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The location of the json output with the shema diff."
+    },
+    {
+      "name": "slackToken",
+      "type": "string",
+      "label": "Slack token",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "The slack token."
+    },
+    {
+      "name": "slackChannel",
+      "type": "string",
+      "label": "Slack channel",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "The slack channel."
+    }
+    
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "task.ps1"
+    }
+  }
+}
