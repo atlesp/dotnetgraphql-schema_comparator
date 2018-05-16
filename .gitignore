@@ -334,3 +334,4 @@ ASALocalRun/
 /vsts_task/GraphqlSchemaComperator/comperator/**
 
 *.vsix
+debug-slacktoken.txt

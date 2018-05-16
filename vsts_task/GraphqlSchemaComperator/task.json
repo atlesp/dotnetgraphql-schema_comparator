@@ -4,7 +4,7 @@
   "friendlyName": "GraphQL Schema Comperator",
   "description": "Compares two graphql schemas",
   "author": "Atle Esperum",
-  "helpMarkDown": "Replace with markdown to show in help",
+  "helpMarkDown": "Compares two graphql schemas and create a diff json. It can also log the changes to Slack.",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -13,21 +13,21 @@
   "demands": [],
   "version": {
     "Major": "0",
-    "Minor": "0",
-    "Patch": "15"
+    "Minor": "10",
+    "Patch": "9"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "GraphqlSchemaComperator $(message)",
   "groups": [
     {
-        "name": "Compare",
+        "name": "compare",
         "displayName": "Compare",
         "isExpanded": true
     },
     {
-        "name": "Slack",
+        "name": "slack",
         "displayName": "Slack settings",
-        "isExpanded": true
+        "isExpanded": false
     }
   ],  
 
@@ -40,7 +40,7 @@
       "defaultValue": "GraphqlApi",
       "required": false,
       "helpMarkDown": "The name used to difference multiple APIs from each other.",
-      "groupName": "Compare"
+      "groupName": "compare"
     },
     {
       "name": "oldSchema",
@@ -49,7 +49,7 @@
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "The location of the file with the old schema",
-      "groupName": "Compare"
+      "groupName": "compare"
     },
     {
       "name": "newSchema",
@@ -58,7 +58,7 @@
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "The location of the file with the new schema that should be compared to the old",
-      "groupName": "Compare"
+      "groupName": "compare"
     },
     {
       "name": "schemaDiff",
@@ -67,15 +67,16 @@
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "The location of the json output with the shema diff.",
-      "groupName": "Compare"
+      "groupName": "compare"
     },
     {
       "name": "failBuildIfApiBroken",
       "type": "boolean",
-      "label": "Fail build if breaking",
+      "label": "Fail build if breaking changes",
       "defaultValue": false,
       "required": false,
-      "helpMarkDown": "Fail build if new schema break the old version"
+      "helpMarkDown": "Fail build if new schema contains breaking changes compared to the old version",
+      "groupName": "compare"
     },
     {
       "name": "slackToken",
@@ -84,7 +85,7 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "The slack token.",
-      "groupName": "Slack"
+      "groupName": "slack"
     },
     {
       "name": "slackChannel",
@@ -93,7 +94,7 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "The slack channel.",
-      "groupName": "Slack"
+      "groupName": "slack"
     },
     {
       "name": "slackBootName",
@@ -102,7 +103,7 @@
       "defaultValue": "GraphQLApi",
       "required": false,
       "helpMarkDown": "The slack boot name to use when posting.",
-      "groupName": "Slack"
+      "groupName": "slack"
     }        
   ],
   "execution": {

@@ -11,26 +11,26 @@ Trace-VstsEnteringInvocation $MyInvocation
 try {
 
     #Get-VstsTaskVariableInfo | Out-Host 
-    $buildId = Get-VstsTaskVariable -name "build.buildId" 
+    
     $buildNumber = Get-VstsTaskVariable -name "build.buildNumber" 
-    $tfsServerUri = Get-VstsTaskVariable -name "system.TeamFoundationServerUri"
+
+    $tfsCollectionUri = Get-VstsTaskVariable -name "System.TeamFoundationCollectionUri"
+
+    $buildUri = Get-VstsTaskVariable -name "build.buildUri"
+    $collectionId = Get-VstsTaskVariable -name "System.CollectionId"
+
+    $buildUriEncoded  = [System.Web.HttpUtility]::UrlEncode($buildUri)
+    $buildurl = "$($tfsCollectionUri)web/build.aspx?pcguid=$collectionId&builduri=$buildUriEncoded"
     
-    #https://domoslabs.visualstudio.com/74b4f0e1-2363-4f63-81e6-ad69bc95feca/_build/index?buildId=1824
-    #$builduri = "$($tfsServerUri)Domos/_build/index?buildId=$buildId&_a=summary"
-    #build.buildNumber 
-    #system.teamFoundationCollectionUri 
-    #build.buildUri    vstfs:///Build/Build/1808 
-    
+     
     $apiName = Get-VstsInput -Name graphqlApiName
     $failBuildIfBroken = Get-VstsInput -Name failBuildIfApiBroken -AsBool
-    
     $bootname = Get-VstsInput -Name slackBootName
+
     $oldSchema = Get-VstsInput -Name oldSchema -Require
     Assert-VstsPath -LiteralPath $oldSchema -PathType Leaf
-
     $newSchema = Get-VstsInput -Name newSchema -Require
     Assert-VstsPath -LiteralPath $oldSchema -PathType Leaf
-
     $schemaDiff = Get-VstsInput -Name schemaDiff -Require
 
     Write-Host "Going to compare the new schema '$newSchema' vs the old schema '$oldSchema'"
@@ -51,13 +51,12 @@ try {
     } else {
         Write-Host "The schemas were not identical. The changes are breaking: $($result.IsBreaking) or dangerous: $($result.IsDangerous)"
     
-        $slackToken = Get-VstsInput -Name slackToken
-        if($slackToken ) {
+        $slackToken = (Get-VstsInput -Name slackToken)
+        if($slackToken -and $slackToken -ne " " ) {
             Write-Host "Slack integration"
             
             $slackChannel = Get-VstsInput -Name slackChannel -Require
-            
-            #-TitleLink https://www.youtube.com/watch?v=TmpRs7xN06Q `
+
             $attachment = $null
             foreach($change in $result.changes){
                 if($change.IsBreaking) {
@@ -66,7 +65,8 @@ try {
                         -Text "$($change.message)" `
                         -Pretext  "" `
                         -Fallback "$($change.message)" `
-                        -ExistingAttachment $attachment
+                        -ExistingAttachment $attachment `
+                        -TitleLink $buildurl
                     
                 } elseif ($change.IsDangerous) {
                     $attachment = New-SlackMessageAttachment -Color '#FFa500' `
@@ -74,7 +74,8 @@ try {
                                 -Text "$($change.message)" `
                                 -Pretext "" `
                                 -Fallback "$($change.message)" `
-                                -ExistingAttachment $attachment
+                                -ExistingAttachment $attachment`
+                                -TitleLink $buildurl
                     
                 } else {
                     $attachment = New-SlackMessageAttachment -Color '#00FF00' `
@@ -82,7 +83,8 @@ try {
                         -Text "$($change.message)" `
                         -Pretext  "" `
                         -Fallback "$($change.message)" `
-                        -ExistingAttachment $attachment
+                        -ExistingAttachment $attachment `
+                        -TitleLink $buildurl 
                     
                 }
             }
@@ -97,7 +99,7 @@ try {
     
             $ignore = $attachment |
                 New-SlackMessage -Channel "$slackChannel" -Text "$mainMessage" -IconUrl "https://www.graphqlbin.com/static/media/logo.57ee3b60.png" -Username "$bootname" |
-                Send-SlackMessage -Token "$slackToken"
+                Send-SlackMessage -Token "$slackToken" 
                       
             Write-Host "Slack integration finished"
         }else {
