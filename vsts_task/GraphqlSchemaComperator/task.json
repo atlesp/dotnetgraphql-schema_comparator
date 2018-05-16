@@ -13,43 +13,69 @@
   "demands": [],
   "version": {
     "Major": "0",
-    "Minor": "10",
-    "Patch": "1"
+    "Minor": "0",
+    "Patch": "15"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "GraphqlSchemaComperator $(message)",
-  "inputs": [
+  "groups": [
     {
-      "name": "cwd",
-      "type": "filePath",
-      "label": "Working Directory",
-      "defaultValue": "",
+        "name": "Compare",
+        "displayName": "Compare",
+        "isExpanded": true
+    },
+    {
+        "name": "Slack",
+        "displayName": "Slack settings",
+        "isExpanded": true
+    }
+  ],  
+
+  "inputs": [
+    
+    {
+      "name": "graphqlApiName",
+      "type": "string",
+      "label": "Graphql API Name",
+      "defaultValue": "GraphqlApi",
       "required": false,
-      "helpMarkDown": "Current working directory when GraphqlSchemaComperator is run."
+      "helpMarkDown": "The name used to difference multiple APIs from each other.",
+      "groupName": "Compare"
     },
     {
       "name": "oldSchema",
-      "type": "string",
+      "type": "filePath",
       "label": "Path to the old schema",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "The location of the file with the old schema"
+      "helpMarkDown": "The location of the file with the old schema",
+      "groupName": "Compare"
     },
     {
       "name": "newSchema",
-      "type": "string",
+      "type": "filePath",
       "label": "Path to the new schema",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "The location of the file with the new schema that should be compared to the old"
+      "helpMarkDown": "The location of the file with the new schema that should be compared to the old",
+      "groupName": "Compare"
     },
     {
       "name": "schemaDiff",
-      "type": "string",
+      "type": "filePath",
       "label": "Path to the schema diff json output",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "The location of the json output with the shema diff."
+      "helpMarkDown": "The location of the json output with the shema diff.",
+      "groupName": "Compare"
+    },
+    {
+      "name": "failBuildIfApiBroken",
+      "type": "boolean",
+      "label": "Fail build if breaking",
+      "defaultValue": false,
+      "required": false,
+      "helpMarkDown": "Fail build if new schema break the old version"
     },
     {
       "name": "slackToken",
@@ -57,7 +83,8 @@
       "label": "Slack token",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "The slack token."
+      "helpMarkDown": "The slack token.",
+      "groupName": "Slack"
     },
     {
       "name": "slackChannel",
@@ -65,9 +92,18 @@
       "label": "Slack channel",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "The slack channel."
-    }
-    
+      "helpMarkDown": "The slack channel.",
+      "groupName": "Slack"
+    },
+    {
+      "name": "slackBootName",
+      "type": "string",
+      "label": "Slack boot name",
+      "defaultValue": "GraphQLApi",
+      "required": false,
+      "helpMarkDown": "The slack boot name to use when posting.",
+      "groupName": "Slack"
+    }        
   ],
   "execution": {
     "PowerShell3": {

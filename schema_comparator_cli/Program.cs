@@ -29,22 +29,40 @@ namespace schema_comparator_cli
             System.Console.WriteLine($"Comparing {opts.NewSchemaFilePath} with {opts.OldSchemaFilePath}");
 
             var comperator = new SchemaComparator();
-
-            var result = comperator.Compare(File.ReadAllText(opts.OldSchemaFilePath), File.ReadAllText(opts.NewSchemaFilePath));
-
-            foreach (var change in result.changes)
+            Result result = null;
+            try
             {
-                System.Console.WriteLine($"{change.Message}");
+                result = comperator.Compare(File.ReadAllText(opts.OldSchemaFilePath), File.ReadAllText(opts.NewSchemaFilePath));
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine("Failed to compare the schemas: " + ex.Message);
+                if (!opts.Silent)
+                {
+                    System.Console.WriteLine("Press a key to continue");
+                    System.Console.ReadKey();
+                }
+
+            }
+            if(result != null)
+            {
+                foreach (var change in result.changes)
+                {
+                    System.Console.WriteLine($"{change.Message}");
+                }
+
+                string json = JsonConvert.SerializeObject(result, Formatting.Indented);
+
+                File.WriteAllText(opts.SchemaDIffResultFilePath, json);
+                if (!opts.Silent)
+                {
+                    System.Console.WriteLine("Press a key to continue");
+                    System.Console.ReadKey();
+                }
+
             }
 
-            string json = JsonConvert.SerializeObject(result, Formatting.Indented);
-
-            File.WriteAllText(opts.SchemaDIffResultFilePath, json);
-            if (!opts.Silent)
-            {
-                System.Console.WriteLine("Press a key to continue");
-                System.Console.ReadKey();
-            }
+            
         }
     }
 }

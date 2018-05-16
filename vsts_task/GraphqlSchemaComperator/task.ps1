@@ -3,6 +3,7 @@
 param()
 
 Import-Module $PSScriptRoot\PSSlack 
+$ErrorActionPreference="Stop"
 
 # For more information on the VSTS Task SDK:
 # https://github.com/Microsoft/vsts-task-lib
@@ -10,20 +11,26 @@ Trace-VstsEnteringInvocation $MyInvocation
 try {
 
     #Get-VstsTaskVariableInfo | Out-Host 
-    # https://domoslabs.visualstudio.com/Domos/_build/index?buildId=1808&_a=summary
     $buildId = Get-VstsTaskVariable -name "build.buildId" 
+    $buildNumber = Get-VstsTaskVariable -name "build.buildNumber" 
     $tfsServerUri = Get-VstsTaskVariable -name "system.TeamFoundationServerUri"
     
-    $builduri = "$($tfsServerUri)Domos/_build/index?buildId=$buildId&_a=summary"
+    #https://domoslabs.visualstudio.com/74b4f0e1-2363-4f63-81e6-ad69bc95feca/_build/index?buildId=1824
+    #$builduri = "$($tfsServerUri)Domos/_build/index?buildId=$buildId&_a=summary"
     #build.buildNumber 
     #system.teamFoundationCollectionUri 
     #build.buildUri    vstfs:///Build/Build/1808 
     
+    $apiName = Get-VstsInput -Name graphqlApiName
+    $failBuildIfBroken = Get-VstsInput -Name failBuildIfApiBroken -AsBool
     
+    $bootname = Get-VstsInput -Name slackBootName
     $oldSchema = Get-VstsInput -Name oldSchema -Require
     Assert-VstsPath -LiteralPath $oldSchema -PathType Leaf
 
     $newSchema = Get-VstsInput -Name newSchema -Require
+    Assert-VstsPath -LiteralPath $oldSchema -PathType Leaf
+
     $schemaDiff = Get-VstsInput -Name schemaDiff -Require
 
     Write-Host "Going to compare the new schema '$newSchema' vs the old schema '$oldSchema'"
@@ -32,6 +39,10 @@ try {
     & $comperator -o "$oldSchema" -n "$newSchema" -d "$schemaDiff" -s
 
     Write-Host "Compared the schemas and the diff is output to '$schemaDiff' "
+
+    if(-not (Test-Path -Path $schemaDiff)) {
+        Write-Error "Failed when comparing the schemas";
+    }
 
     $result = Get-Content $schemaDiff | ConvertFrom-Json 
         
@@ -45,7 +56,7 @@ try {
             Write-Host "Slack integration"
             
             $slackChannel = Get-VstsInput -Name slackChannel -Require
-            $bootname = "GraphQLApi"
+            
             #-TitleLink https://www.youtube.com/watch?v=TmpRs7xN06Q `
             $attachment = $null
             foreach($change in $result.changes){
@@ -76,21 +87,25 @@ try {
                 }
             }
 
-            $mainMessage = "GraphQL API has some changes."
+            $mainMessage = "Build $buildNumber for GraphQL API '$apiName' has some changes."
             if($result.IsBreaking){
-                    $mainMessage = "At least one of the GraphQL API changes are breaking previous version."
+                    $mainMessage = "At least one of the GraphQL API '$apiName' changes in build $buildNumber are breaking previous version."
             } elseif($result.IsDangerous) {
-                $mainMessage = "At least one of the GraphQL API changes are dangerouscompared to previous version."
+                $mainMessage = "At least one of the GraphQL API '$apiName' changes in build $buildNumber are dangerous compared to previous version."
             }
             
     
             $ignore = $attachment |
-                New-SlackMessage -Channel "$slackChannel" -Text "$mainMessage" -IconEmoji :bomb: -Username "$bootname" |
+                New-SlackMessage -Channel "$slackChannel" -Text "$mainMessage" -IconUrl "https://www.graphqlbin.com/static/media/logo.57ee3b60.png" -Username "$bootname" |
                 Send-SlackMessage -Token "$slackToken"
                       
             Write-Host "Slack integration finished"
         }else {
             Write-Host "Slack integration not configured"
+        }
+
+        if($result.IsBreaking -and $failBuildIfBroken) {
+            Write-Error "Build failed since the API schemas has breaking changes and taks is configured to fail when that happens."
         }
     }
 
