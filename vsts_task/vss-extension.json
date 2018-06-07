@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "graphql-schema-comperator",
     "name": "GraphQL Schema Comperator",
-    "version": "0.10.9",
+    "version": "0.10.10",
     "publisher": "AtleEsperum",
     "targets": [
         {

@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param()
 
-Import-Module $PSScriptRoot\PSSlack 
+Import-Module $PSScriptRoot\PSSlack -WarningAction Ignore
 $ErrorActionPreference="Stop"
 
 # For more information on the VSTS Task SDK:
@@ -59,34 +59,26 @@ try {
 
             $attachment = $null
             foreach($change in $result.changes){
+                $changePretext = "Safe change"
+                $color = '#00FF00'
                 if($change.IsBreaking) {
-                    $attachment = New-SlackMessageAttachment -Color '#FF0000' `
-                        -Title "Breaking changes $($change.name): $($change.path)" `
-                        -Text "$($change.message)" `
-                        -Pretext  "" `
-                        -Fallback "$($change.message)" `
-                        -ExistingAttachment $attachment `
-                        -TitleLink $buildurl
+                    $changePretext = "Breaking changes"
+                    $color = '#FF0000'
                     
                 } elseif ($change.IsDangerous) {
-                    $attachment = New-SlackMessageAttachment -Color '#FFa500' `
-                                -Title "Dangerous change $($change.name) : $($change.path)" `
-                                -Text "$($change.message)" `
-                                -Pretext "" `
-                                -Fallback "$($change.message)" `
-                                -ExistingAttachment $attachment`
-                                -TitleLink $buildurl
-                    
-                } else {
-                    $attachment = New-SlackMessageAttachment -Color '#00FF00' `
-                        -Title "Safe change $($change.name): $($change.path)" `
-                        -Text "$($change.message)" `
-                        -Pretext  "" `
-                        -Fallback "$($change.message)" `
-                        -ExistingAttachment $attachment `
-                        -TitleLink $buildurl 
-                    
+                    $changePretext = "Dangerous changes"
+                    $color = '#FFa500'
                 }
+                Write-Host "Adding attachment $changePretext"
+                $attachment = New-SlackMessageAttachment -Color $color `
+                    -Title "changePretext $($change.name): $($change.path)" `
+                    -Text "$($change.message)" `
+                    -Pretext  "" `
+                    -Fallback "$($change.message)" `
+                    -ExistingAttachment $attachment `
+                    -TitleLink $buildurl 
+                
+                
             }
 
             $mainMessage = "Build $buildNumber for GraphQL API '$apiName' has some changes."
@@ -107,7 +99,7 @@ try {
         }
 
         if($result.IsBreaking -and $failBuildIfBroken) {
-            Write-Error "Build failed since the API schemas has breaking changes and taks is configured to fail when that happens."
+            Write-Error "Build failed since the API schemas has breaking changes and task is configured to fail when that happens."
         }
     }
 
