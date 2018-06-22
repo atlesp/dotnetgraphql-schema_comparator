@@ -89,11 +89,28 @@ try {
             }
             
     
-            $ignore = $attachment |
-                New-SlackMessage -Channel "$slackChannel" -Text "$mainMessage" -IconUrl "https://www.graphqlbin.com/static/media/logo.57ee3b60.png" -Username "$bootname" |
-                Send-SlackMessage -Token "$slackToken" 
-                      
-            Write-Host "Slack integration finished"
+            try{
+                $ignore = $attachment |
+                    New-SlackMessage -Channel "$slackChannel" -Text "$mainMessage" -IconUrl "https://www.graphqlbin.com/static/media/logo.57ee3b60.png" -Username "$bootname" |
+                    Send-SlackMessage -Token "$slackToken" -Verbose
+                        
+                Write-Host "Slack integration finished"
+            }catch {
+                $attachment = $null
+                $message = "FAILED TO SEND DETAILS OF CHANGES TO SLACK"
+                Write-Host "$message"
+
+                $ignore = New-SlackMessageAttachment -Color "#FF0000" `
+                                -Title "Error" `
+                                -Text "$message" `
+                                -Pretext  "" `
+                                -Fallback "$message" `
+                                -ExistingAttachment $attachment `
+                                -TitleLink $buildurl |
+                         New-SlackMessage -Channel "$slackChannel" -Text "$mainMessage" -IconUrl "https://www.graphqlbin.com/static/media/logo.57ee3b60.png" -Username "$bootname" |
+                         Send-SlackMessage -Token "$slackToken"  -Verbose
+
+            }
         }else {
             Write-Host "Slack integration not configured"
         }
