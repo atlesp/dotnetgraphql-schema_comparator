@@ -35,8 +35,8 @@
     <Reference Include="CommandLine, Version=2.2.1.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.2.2.1\lib\net45\CommandLine.dll</HintPath>
     </Reference>
-    <Reference Include="GraphQL, Version=2.0.0.899, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GraphQL.2.0.0-alpha-899\lib\net45\GraphQL.dll</HintPath>
+    <Reference Include="GraphQL, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GraphQL.2.0.0\lib\net45\GraphQL.dll</HintPath>
     </Reference>
     <Reference Include="GraphQL-Parser, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\GraphQL-Parser.3.0.0\lib\net45\GraphQL-Parser.dll</HintPath>
