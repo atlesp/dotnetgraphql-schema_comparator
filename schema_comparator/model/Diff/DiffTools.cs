@@ -7,6 +7,7 @@ namespace schema_comparator.model.Diff
     internal static class DiffTools
     {
         internal delegate Change CreateChangeGraphType(INamedType t);
+        internal delegate Change CreateChangeGraphTypeArgument(QueryArgument a);
 
         internal static IEnumerable<Change> AddedElements(IEnumerable<INamedType> oldElements, IEnumerable<INamedType> newElements, CreateChangeGraphType creator)
         {
@@ -20,6 +21,16 @@ namespace schema_comparator.model.Diff
             return oldElements.Where(t => !newElements.Any(nt => nt.Name.Equals(t.Name))).Select(d => creator(d));
         }
 
+        internal static IEnumerable<Change> RemovedElements(QueryArguments oldElements, QueryArguments newElements, CreateChangeGraphTypeArgument creator)
+        {
+            return oldElements.Where(t => !newElements.Any(nt => nt.Name.Equals(t.Name))).Select(d => creator(d));
+        }
+
+
+        internal static IEnumerable<Change> RemovedElements(IEnumerable<IFieldType> oldElements, IEnumerable<IFieldType> newElements, CreateChangeFieldType creator)
+        {
+            return oldElements.Where(t => !newElements.Any(nt => nt.Name.Equals(t.Name))).Select(d => creator(d));
+        }
 
         internal delegate Change CreateChangeFieldType(IFieldType t);
 
@@ -30,11 +41,13 @@ namespace schema_comparator.model.Diff
                 .Select(d => creator(d));
         }
 
-        internal static IEnumerable<Change> RemovedElements(IEnumerable<IFieldType> oldElements, IEnumerable<IFieldType> newElements, CreateChangeFieldType creator)
+        internal static IEnumerable<Change> AddedElements(QueryArguments oldElements, QueryArguments newElements, CreateChangeGraphTypeArgument creator)
         {
-            return oldElements.Where(t => !newElements.Any(nt => nt.Name.Equals(t.Name))).Select(d => creator(d));
+            return newElements
+                .Where(t => !oldElements.Any(ot => ot.Name.Equals(t.Name)))
+                .Select(d => creator(d));
         }
-
+        
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
 using System;
+using GraphQL;
 
 namespace schema_comparator
 {
@@ -475,6 +476,72 @@ namespace schema_comparator
 
     }
 
+
+
+    public class FieldArgumentRemoved : Change
+    {
+  
+        private readonly IGraphType objectType;
+        private readonly IFieldType field;
+        private readonly QueryArgument argument;
+
+  
+        public FieldArgumentRemoved(IGraphType objectType, IFieldType field, QueryArgument argument) : base(Criticality.Breaking)
+        {
+            this.objectType = objectType;
+            this.field = field;
+            this.argument = argument;
+
+        }
+
+
+        protected override string GetMessage()
+        {
+            return $"Argument `{ argument.Name}: { argument.Type}` was removed from field `{ objectType.Name}.{ field.Name}`";
+        }
+
+        protected override string GetPath()
+        {
+            //[ object_type.name, field.name, argument.name].join('.')
+            return $"{objectType.Name}.{field.Name}.{argument.Name}";
+        }
+
+
+    }
+
+
+    public class FieldArgumentAdded : Change
+    {
+        
+        private readonly IGraphType objectType;
+        private readonly IFieldType oldField;
+        private readonly QueryArgument argument;
+
+
+        public FieldArgumentAdded(IGraphType objectType, IFieldType oldField, QueryArgument argument) 
+                : base(argument.ResolvedType is NonNullGraphType ? Criticality.NonBreaking : Criticality.Breaking)
+        {
+
+            this.objectType = objectType;
+            this.oldField = oldField;
+            this.argument = argument;
+
+        }
+        
+    protected override string GetMessage()
+        {
+            return $"Argument `{ argument.Name}: { argument.Type.Name}` added to field `{ objectType.Name}.{ oldField.Name}`";
+        }
+
+        protected override string GetPath()
+        {
+            return $"{objectType.Name}.{oldField.Name}.{argument.Name}";
+        }
+
+    }
+
+
+
     public class InputFieldTypeChanged : Change
     {
         private readonly IGraphType objectType;
@@ -483,7 +550,7 @@ namespace schema_comparator
 
         public InputFieldTypeChanged(IGraphType objectType, IFieldType oldField, IFieldType newField) : base(Criticality.Breaking)
         {
-            //reason: "Changing an input field from non-null to null is considered non-breaking"
+            //TODO:  reason: "Changing an input field from non-null to null is considered non-breaking"
             this.objectType = objectType;
             this.oldField = oldField;
             this.newField = newField;
@@ -528,6 +595,82 @@ namespace schema_comparator
 
     }
 
+
+    public class FieldArgumentTypeChanged : Change
+    {
+        // include SafeTypeChange
+        private readonly IGraphType objectType;
+        private readonly IFieldType oldField;
+        private readonly QueryArgument oldArgument;
+        private readonly QueryArgument newArgument;
+
+        public FieldArgumentTypeChanged(IGraphType objectType, IFieldType field, QueryArgument oldArgument, QueryArgument newArgument) 
+                        : base(Criticality.Breaking)
+        {
+            /*if safe_change_for_input_value ? (old_argument.type, new_argument.type)
+            @criticality = Changes::Criticality.non_breaking(
+                reason: "Changing an input field from non-null to null is considered non-breaking"
+            )
+            else
+            @criticality = Changes::Criticality.breaking
+            */
+
+            //"Changing an input field from non-null to null is considered non-breaking"
+            this.objectType = objectType;
+            this.oldField = field;
+            this.newArgument= newArgument;
+            this.oldArgument = oldArgument;
+        }
+        protected override string GetMessage()
+        {
+           
+            return $"Type for argument `{ newArgument.Name}` on field `{objectType.Name}.{ oldField.Name}` changed" +
+                        $" from `{oldArgument.Type.Name}` to `{newArgument.Type.Name}`";
+        }
+
+        protected override string GetPath()
+        {
+            return $"{objectType.Name}.{oldField.Name}.{oldArgument.Name}";
+        }
+        
+
+    }
+
+
+    public class FieldTypeChanged : Change
+    {
+       // include SafeTypeChange
+
+        
+        private readonly IGraphType objectType;
+        private readonly IFieldType oldField;
+        private readonly IFieldType newField;
+
+        public FieldTypeChanged(IGraphType objectType, IFieldType oldField, IFieldType newField) : base(Criticality.Breaking)
+        {
+            /*
+            if safe_change_for_field?(old_field.type, new_field.type)
+                Changes::Criticality.non_breaking
+            else
+                Changes::Criticality.breaking
+             */
+            this.objectType = objectType;
+            this.oldField = oldField;
+            this.newField = newField;
+        }
+        
+
+        protected override string GetMessage()
+        {
+            return $"Field `{objectType}.{oldField.Name}` changed type from `{oldField.Type}` to `{newField.Type}`";
+        }
+
+        protected override string GetPath()
+        {
+            return $"{objectType.Name}.{oldField.Name}";
+        }
+        
+    }
 
     /*
     class InputFieldDefaultChanged < AbstractChange
@@ -581,24 +724,6 @@ union_type.name
 end
 end
 
-class FieldArgumentRemoved < AbstractChange
-attr_reader :object_type, :field, :argument, :criticality
-
-def initialize(object_type, field, argument)
-@object_type = object_type
-@field = field
-@argument = argument
-@criticality = Changes::Criticality.breaking
-end
-
-def message
-"Argument `{argument.name}: {argument.type}` was removed from field `{object_type.name}.{field.name}`"
-end
-
-def path
-[object_type.name, field.name, argument.name].join('.')
-end
-end
 
 class DirectiveArgumentRemoved < AbstractChange
 attr_reader :directive, :argument, :criticality
@@ -639,63 +764,7 @@ end
 
 
 
-class FieldTypeChanged < AbstractChange
-include SafeTypeChange
 
-attr_reader :type, :old_field, :new_field
-
-def initialize(type, old_field, new_field)
-@type = type
-@old_field = old_field
-@new_field = new_field
-end
-
-def message
-"Field `{type}.{old_field.name}` changed type from `{old_field.type}` to `{new_field.type}`"
-end
-
-def criticality
-if safe_change_for_field?(old_field.type, new_field.type)
-Changes::Criticality.non_breaking
-else
-Changes::Criticality.breaking
-end
-end
-
-def path
-[type.name, old_field.name].join('.')
-end
-end
-
-class FieldArgumentTypeChanged < AbstractChange
-include SafeTypeChange
-
-attr_reader :type, :field, :old_argument, :new_argument, :criticality
-
-def initialize(type, field, old_argument, new_argument)
-if safe_change_for_input_value?(old_argument.type, new_argument.type)
-@criticality = Changes::Criticality.non_breaking(
-reason: "Changing an input field from non-null to null is considered non-breaking"
-)
-else
-@criticality = Changes::Criticality.breaking
-end
-
-@type = type
-@field = field
-@old_argument = old_argument
-@new_argument = new_argument
-end
-
-def message
-"Type for argument `{new_argument.name}` on field `{type.name}.{field.name}` changed"\
-" from `{old_argument.type}` to `{new_argument.type}`"
-end
-
-def path
-[type.name, field.name, old_argument.name].join('.')
-end
-end
 
 class DirectiveArgumentTypeChanged < AbstractChange
 include SafeTypeChange
@@ -803,29 +872,6 @@ end
 
 # Mostly Non-Breaking Changes
 
-class FieldArgumentAdded < AbstractChange
-attr_reader :type, :field, :argument, :criticality
-
-def initialize(type, field, argument)
-@criticality = if argument.type.non_null?
-Changes::Criticality.breaking
-else
-Changes::Criticality.non_breaking
-end
-
-@type = type
-@field = field
-@argument = argument
-end
-
-def message
-"Argument `{argument.name}: {argument.type}` added to field `{type.name}.{field.name}`"
-end
-
-def path
-[type.name, field.name, argument.name].join(".")
-end
-end
 
 
 

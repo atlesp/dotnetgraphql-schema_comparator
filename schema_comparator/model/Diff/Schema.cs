@@ -142,7 +142,7 @@ namespace schema_comparator
             }
 
 
-            if (!isTypeDescrptionEqual(oldType, newType))
+            if (!IsTypeDescriptionEqual(oldType, newType))
             {
                 changes.Add(new TypeDescriptionChanged(oldType, newType));
             }
@@ -151,7 +151,7 @@ namespace schema_comparator
 
         }
 
-        private static bool isTypeDescrptionEqual(IGraphType oldType, IGraphType newType)
+        private static bool IsTypeDescriptionEqual(IGraphType oldType, IGraphType newType)
         {
             if (oldType.Description == null && newType.Description == null) return true;
             if (oldType.Description == null || newType.Description == null) return false;
@@ -168,7 +168,7 @@ namespace schema_comparator
             foreach (var newDirective in this.newDirectives)
             {
 
-                var oldDirective = this.oldDirectives.Where(t => t.Name.Equals(newDirective.Name)).SingleOrDefault();
+                var oldDirective = oldDirectives.Where(t => t.Name.Equals(newDirective.Name)).SingleOrDefault();
                 if (oldDirective != null)
                 {
                     changes.AddRange(new Directive(oldDirective, newDirective).Diff());

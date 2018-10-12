@@ -59,6 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="model\Changes\Criticality.cs" />
+    <Compile Include="model\Changes\SafeTypeChanges.cs" />
+    <Compile Include="model\Diff\Argument.cs" />
     <Compile Include="model\Diff\Directive.cs" />
     <Compile Include="model\Diff\Field.cs" />
     <Compile Include="model\Diff\InputField.cs" />

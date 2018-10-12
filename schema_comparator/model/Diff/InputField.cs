@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GraphQL.Types;
 
 namespace schema_comparator.model.Diff

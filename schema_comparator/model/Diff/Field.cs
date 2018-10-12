@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 
 namespace schema_comparator.model.Diff
@@ -32,28 +33,30 @@ namespace schema_comparator.model.Diff
             /*
             if old_field.description != new_field.description
             changes << Changes::FieldDescriptionChanged.new(new_type, old_field, new_field)
-          end*/
+            end*/
 
             if (oldField.DeprecationReason != newField.DeprecationReason)
             {
                 changes.Add(new FieldDeprecationChanged(newType, oldField, newField));
             }
 
+            if (oldField.ResolvedType.Name != newField.ResolvedType.Name)
+            {
+                changes.Add(new FieldTypeChanged(oldType, oldField, newField));
+            }
 
-            /*
-
-            if old_field.type != new_field.type
-              changes << Changes::FieldTypeChanged.new(new_type, old_field, new_field)
-            end
-
-            changes += arg_removals
-
-            changes += arg_additions
-
-            each_common_argument do | old_arg, new_arg |
-               changes += Diff::Argument.new(new_type, new_field, old_arg, new_arg).diff
-            end
-            */
+            changes.AddRange(DiffTools.RemovedElements(oldArguments, newArguments,  a => new FieldArgumentRemoved(newType, oldField, a)));
+            changes.AddRange(DiffTools.AddedElements(oldArguments, newArguments, a => new FieldArgumentAdded(newType, newField, a)));
+            
+            foreach (var newArg in this.newArguments)
+            {
+                QueryArgument oldArg = oldArguments.SingleOrDefault(t => t.Name.Equals(newArg.Name));
+                if (oldArg != null)
+                {
+                    changes.AddRange(new Diff.Argument(newType, newField, oldArg, newArg).Diff());
+                }
+            }
+   
             return changes;
 
         }

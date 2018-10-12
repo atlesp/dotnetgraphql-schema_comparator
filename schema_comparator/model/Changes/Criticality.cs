@@ -5,6 +5,7 @@
 
         NonBreaking,
         Dangerous,
-        Breaking
+        Breaking,
+        Information
     }
 }
