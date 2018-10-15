@@ -3,3 +3,6 @@ solution: dotnetgraphql-schema_comparator.sln
 install:
   - sudo apt-get install -y gtk-sharp2
   - nuget restore dotnetgraphql-schema_comparator.sln
+Script:
+  - xbuild /p:Configuration=Release dotnetgraphql-schema_comparator.sln
+  - mono ./packages/xunit.runners.*/tools/xunit.console.clr4.exe ./schema_comparatorTests/bin/Release/schema_comparatorTests.dll
