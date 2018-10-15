@@ -1,14 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿
 using System;
+using NUnit.Framework.Internal;
+using NUnit.Framework;
 
 namespace schema_comparator.Tests
 {
-    [TestClass()]
+    [TestFixture()]
     public class SchemaComparatorTests
     {
         readonly SchemaComparator _comperator = new SchemaComparator();
 
-        [TestMethod()]
+        [Test]
         public void empty_schemas_has_no_changes()
         {
             Result result = _comperator.Compare("", "");
@@ -16,14 +18,14 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void type_is_removed()
         {
             Result result = _comperator.Compare("type A { a: String } ", " ");
             VerfiyChanges(result, typeof(TypeRemovedChange), "A", Criticality.Breaking);
         }
 
-        [TestMethod()]
+        [Test]
         public void type_is_added()
         {
 
@@ -32,7 +34,7 @@ namespace schema_comparator.Tests
             
         }
 
-        [TestMethod()]
+        [Test]
         public void type_has_changed_type()
         {
             Result result = _comperator.Compare("type Query { a: A } type A { a: String } ", "type Query { a: A }  enum A { A_VALUE ANOTHER_VALUE } ");
@@ -41,7 +43,8 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod(), Ignore]
+        [Test()]
+        [Ignore("Not implemented")]
         public void type_description_has_changed()
         {
             Result result = _comperator.Compare("#desc " + System.Environment.NewLine + "type A { a: String } ", "#newdesc" + System.Environment.NewLine + "type A { a: String } ");
@@ -50,7 +53,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void enum_value_added()
         {
             Result result = _comperator.Compare("enum A { A_VALUE }  ", "enum A { A_VALUE, A_VALUE ANOTHER_VALUE } ");
@@ -60,7 +63,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void enum_value_removed()
         {
             Result result = _comperator.Compare("enum A { A_VALUE,  A_VALUE ANOTHER_VALUE }  ", "enum A { A_VALUE } ");
@@ -69,7 +72,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void object_type_field_removed()
         {
             Result result = _comperator.Compare("type A { a: String, b:String } ", "type A { a: String }");
@@ -78,7 +81,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void object_type_field_added()
         {
             Result result = _comperator.Compare("type A { a: String } ", "type A { a: String, b:String }");
@@ -87,7 +90,8 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod(), Ignore]
+        [Test]
+        [Ignore("Not implemented")]
         public void object_type_interface_removed()
         {
             Result result = _comperator.Compare("interface I {a: String} type A implements I { a: String } ", "interface I {a: String} type A { a: String }");
@@ -96,7 +100,8 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod(), Ignore]
+        [Test]
+        [Ignore("Not implemented")]
         public void object_type_interface_added()
         {
             Result result = _comperator.Compare("type A { a: String }", "interface I {a: String} type A implements I { a: String } ");
@@ -105,7 +110,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void directive_added()
         {
             Result result = _comperator.Compare("", "directive @A ( a: String ) on FIELD_DEFINITION");
@@ -114,7 +119,7 @@ namespace schema_comparator.Tests
 
         }
 
-        [TestMethod()]
+        [Test]
         public void directive_removed()
         {
             Result result = _comperator.Compare("directive @A ( a: String ) on FIELD_DEFINITION", "");
@@ -123,7 +128,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void schema_query_changed()
         {
             Result result = _comperator.Compare("schema { query: MyQuery} type MyQuery {} type MyQueryNext {}", "schema { query: MyQueryNext} type MyQuery {}  type MyQueryNext {}");
@@ -131,7 +136,7 @@ namespace schema_comparator.Tests
 
         }
 
-        [TestMethod()]
+        [Test]
         public void schema_mutation_changed()
         {
             Result result = _comperator.Compare("schema { mutation: MyMutation} type MyMutation {} type MyMutationNext {}", 
@@ -140,7 +145,7 @@ namespace schema_comparator.Tests
 
         }
 
-        [TestMethod()]
+        [Test]
         public void schema_subscription_changed()
         {
             Result result = _comperator.Compare("schema { subscription: MySubscription} type MySubscription {} type MySubscriptionNext {}", 
@@ -150,7 +155,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void input_object_field_added()
         {
             Result result = _comperator.Compare("input MessageInput { content: String}",
@@ -159,7 +164,7 @@ namespace schema_comparator.Tests
             
         }
 
-        [TestMethod()]
+        [Test]
         public void input_object_field_removed()
         {
             Result result = _comperator.Compare("input MessageInput { content: String, author: String}",
@@ -168,7 +173,7 @@ namespace schema_comparator.Tests
             
         }
 
-        [TestMethod()]
+        [Test]
         public void input_object_field_type_changed()
         {
             Result result = _comperator.Compare("input MessageInput { content: String}",
@@ -179,7 +184,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void input_object_field_defaultvalue_changed()
         {
             Result result = _comperator.Compare("input MessageInput { content: String = \"default\" }",
@@ -190,7 +195,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void type_field_deprecated()
         {
             Result result = _comperator.Compare("type A { b: String }",
@@ -200,11 +205,11 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod(), Ignore]
+        [Test]
+        [Ignore("seems like the comparator it ignore lower/upper case differences")]
         public void field_argument_name_casing_changed()
         {
-            // seems like the comparator it ignore lower/upper case differences
-
+            
             Result result = _comperator.Compare("type Starship {length(Unit: String): Float}",
                 "type Starship {Length(Unit: String): Float}");
 
@@ -213,7 +218,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void field_argument_removed()
         {
             Result result = _comperator.Compare("type Starship { field (a: String, b: String): Float}",
@@ -224,7 +229,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void field_argument_added()
         {
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
@@ -234,7 +239,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void field_nullable_argument_added()
         {
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
@@ -244,7 +249,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void field_argument_type_changed()
         {
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
@@ -253,7 +258,7 @@ namespace schema_comparator.Tests
             VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking);
         }
 
-        [TestMethod()]
+        [Test]
         public void field_argument_default_value_changed()
         {
             Result result = _comperator.Compare("type Starship { field (a: Int = 10): Float }",
@@ -263,7 +268,7 @@ namespace schema_comparator.Tests
 
         }
 
-        [TestMethod()]
+        [Test]
         public void field_argument_default_value_added()
         {
           
@@ -274,7 +279,7 @@ namespace schema_comparator.Tests
 
         }
 
-        [TestMethod()]
+        [Test]
         public void field_argument_default_value_removed()
         {
 
@@ -288,7 +293,7 @@ namespace schema_comparator.Tests
 
 
 
-        [TestMethod()]
+        [Test]
         public void field_argument_type_changed_to_nullable()
         {
             Result result = _comperator.Compare("type Starship { field (a: String!): Float}",
@@ -298,7 +303,7 @@ namespace schema_comparator.Tests
             VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.NonBreaking);
         }
 
-        [TestMethod()]
+        [Test]
         public void field_argument_type_changed_to_nullable_and_type()
         {
             Result result = _comperator.Compare("type Starship { field (a: String!): Float}",
@@ -309,7 +314,7 @@ namespace schema_comparator.Tests
         }
 
 
-        [TestMethod()]
+        [Test]
         public void field_type_changed()
         {
             Result result = _comperator.Compare("type Starship { field : Float}",
@@ -319,11 +324,12 @@ namespace schema_comparator.Tests
             VerfiyChanges(result, typeof(FieldTypeChanged), "Starship.field", Criticality.Breaking);
         }
 
-        [TestMethod(),Ignore]
+        [Test]
+        [Ignore("Not implemented")]
         public void field_type_changed_to_nullable()
         {
-            Result result = _comperator.Compare("type Starship { field : Float}",
-                "type Starship { field : Float! }");
+            Result result = _comperator.Compare("type Starship { field : Float!}",
+                "type Starship { field : Float }");
             
             VerfiyChanges(result, typeof(FieldTypeChanged), "Starship.field", Criticality.NonBreaking);
         }
