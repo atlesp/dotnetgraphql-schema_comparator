@@ -36,11 +36,12 @@ namespace schema_comparator_cli
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine("Failed to compare the schemas: " + ex.Message);
+                
                 if (!opts.Silent)
                 {
-                    System.Console.WriteLine("Press a key to continue");
-                    System.Console.ReadKey();
+                    Console.WriteLine("Failed to compare the schemas: " + ex.Message);
+                    Console.WriteLine("Press a key to continue");
+                    Console.ReadKey();
                 }
 
             }

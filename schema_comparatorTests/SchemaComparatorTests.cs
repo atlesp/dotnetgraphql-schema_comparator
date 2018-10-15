@@ -253,15 +253,59 @@ namespace schema_comparator.Tests
             VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking);
         }
 
+        [TestMethod()]
+        public void field_argument_default_value_changed()
+        {
+            Result result = _comperator.Compare("type Starship { field (a: Int = 10): Float }",
+                "type Starship { field(a: Int = 9 ): Float }");
 
-        [TestMethod(), Ignore]
+            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
+
+        }
+
+        [TestMethod()]
+        public void field_argument_default_value_added()
+        {
+          
+           var result = _comperator.Compare("type Starship { field (a: Int ): Float}",
+                "type Starship { field(a: Int = 9 ): Float }");
+
+            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
+
+        }
+
+        [TestMethod()]
+        public void field_argument_default_value_removed()
+        {
+
+            var result = _comperator.Compare("type Starship { field (a: Int = 9): Float}",
+                "type Starship { field(a: Int ): Float }");
+
+            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
+
+        }
+
+
+
+
+        [TestMethod()]
         public void field_argument_type_changed_to_nullable()
         {
-            Result result = _comperator.Compare("type Starship { field (a: String): Float}",
-                "type Starship { field(a: String! ): Float }");
+            Result result = _comperator.Compare("type Starship { field (a: String!): Float}",
+                "type Starship { field(a: String ): Float }");
 
 
             VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.NonBreaking);
+        }
+
+        [TestMethod()]
+        public void field_argument_type_changed_to_nullable_and_type()
+        {
+            Result result = _comperator.Compare("type Starship { field (a: String!): Float}",
+                "type Starship { field(a: Int ): Float }");
+
+
+            VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking);
         }
 
 

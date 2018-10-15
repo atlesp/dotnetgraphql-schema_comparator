@@ -541,7 +541,51 @@ namespace schema_comparator
     }
 
 
+    public class FieldArgumentDefaultChanged : Change { 
+        
+        private readonly IGraphType objectType;
+        private readonly IFieldType oldField;
+        private readonly QueryArgument oldArgument;
+        private readonly QueryArgument newArgument;
 
+
+        public FieldArgumentDefaultChanged(IGraphType objectType, IFieldType field,
+                                         QueryArgument oldArgument, QueryArgument newArgument) 
+            : base(Criticality.Dangerous)
+        {
+            this.objectType = objectType;
+            this.oldField = field;
+            this.newArgument = newArgument;
+            this.oldArgument = oldArgument;
+            // reason: "Changing the default value for an argument may change the runtime " \
+            //"behaviour of a field if it was never provided."
+                
+        }
+
+        
+        protected override string GetMessage()
+        {
+            if (oldArgument.DefaultValue == null)
+            {
+                return
+                    $"Default value `{newArgument.DefaultValue}` was added to argument `{newArgument.Name}` on field `{objectType.Name}.{oldField.Name}`";
+            }
+            else
+            {
+                return $"Default value for argument `{newArgument.Name}` on field `{objectType.Name}.{oldField.Name}` changed"
+                       + $" from `{oldArgument.DefaultValue}` to `{newArgument.DefaultValue}`";
+            }
+        }
+
+        protected override string GetPath()
+        {
+            return $"{objectType.Name}.{oldField.Name}.{oldArgument.Name}";
+        }
+        
+
+    }
+
+    
     public class InputFieldTypeChanged : Change
     {
         private readonly IGraphType objectType;
@@ -598,24 +642,28 @@ namespace schema_comparator
 
     public class FieldArgumentTypeChanged : Change
     {
-        // include SafeTypeChange
         private readonly IGraphType objectType;
         private readonly IFieldType oldField;
         private readonly QueryArgument oldArgument;
         private readonly QueryArgument newArgument;
 
-        public FieldArgumentTypeChanged(IGraphType objectType, IFieldType field, QueryArgument oldArgument, QueryArgument newArgument) 
-                        : base(Criticality.Breaking)
-        {
-            /*if safe_change_for_input_value ? (old_argument.type, new_argument.type)
-            @criticality = Changes::Criticality.non_breaking(
-                reason: "Changing an input field from non-null to null is considered non-breaking"
-            )
-            else
-            @criticality = Changes::Criticality.breaking
-            */
 
-            //"Changing an input field from non-null to null is considered non-breaking"
+        private static Criticality getCriticalityLevel(QueryArgument oldArgument, QueryArgument newArgument)
+        {
+            if ((oldArgument.ResolvedType is NonNullGraphType && !(newArgument.ResolvedType is NonNullGraphType))
+                && ((NonNullGraphType)oldArgument.ResolvedType).ResolvedType.Name == newArgument.ResolvedType.Name)
+            {
+                //"Changing an input field from non-null to null is considered non-breaking"
+                return Criticality.NonBreaking;
+            }
+
+            return Criticality.Breaking;
+        }
+
+        public FieldArgumentTypeChanged(IGraphType objectType, IFieldType field, QueryArgument oldArgument, QueryArgument newArgument) 
+                        : base(getCriticalityLevel(oldArgument, newArgument))
+        {
+   
             this.objectType = objectType;
             this.oldField = field;
             this.newArgument= newArgument;
@@ -798,33 +846,6 @@ end
 
 # Dangerous Changes
 
-class FieldArgumentDefaultChanged < AbstractChange
-attr_reader :type, :field, :old_argument, :new_argument, :criticality
-
-def initialize(type, field, old_argument, new_argument)
-@type = type
-@field = field
-@old_argument = old_argument
-@new_argument = new_argument
-@criticality = Changes::Criticality.dangerous(
-reason: "Changing the default value for an argument may change the runtime " \
-"behaviour of a field if it was never provided."
-)
-end
-
-def message
-if old_argument.default_value.nil?
-"Default value `{new_argument.default_value}` was added to argument `{new_argument.name}` on field `{type.name}.{field.name}`"
-else
-"Default value for argument `{new_argument.name}` on field `{type.name}.{field.name}` changed"\
-" from `{old_argument.default_value}` to `{new_argument.default_value}`"
-end
-end
-
-def path
-[type.name, field.name, old_argument.name].join('.')
-end
-end
 
 class DirectiveArgumentDefaultChanged < AbstractChange
 attr_reader :directive, :old_argument, :new_argument, :criticality
