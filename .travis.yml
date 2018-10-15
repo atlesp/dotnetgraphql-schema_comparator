@@ -3,6 +3,8 @@ solution: dotnetgraphql-schema_comparator.sln
 install:
   - sudo apt-get install -y gtk-sharp2
   - nuget restore dotnetgraphql-schema_comparator.sln
+  - npm install -g tfx-cli
+  - nuget install NUnit.Runners -Version 3.9.0 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release dotnetgraphql-schema_comparator.sln
   - mono ./testrunner/NUnit.Runners.*/tools/nunit-console.exe ./schema_comparatorTests/bin/Release/schema_comparatorTests.dll

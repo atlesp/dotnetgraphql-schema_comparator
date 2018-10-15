@@ -8,6 +8,9 @@ The idea and structure of this project taken from the Ruby procject [graphql-sch
   - Applying custom rules to schema changes
   - Building automated tools like linters
 
+  
+https://travis-ci.com/atlesp/dotnetgraphql-schema_comparator   
+  
 ## Installation
 
 ```
@@ -72,6 +75,8 @@ Possible changes are all found in [Changes.cs](model/Changes/changes.cs).
 
 Each change object has a `#criticality` method which returns a `Changes::Criticality` object.
 This objects defines how dangerous a change is to a schema.
+
+
 
 
 The library is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
