@@ -1,3 +1,10 @@
+<a name="1.2.2"></a>
+## <small>1.2.2 (2018-10-16)</small>
+
+* Bumping patch instead of minor when bumping version ([2000d0d](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/2000d0d))
+
+
+
 <a name="1.2.0"></a>
 ## 1.2.0 (2018-10-16)
 
