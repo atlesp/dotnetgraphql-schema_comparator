@@ -8,6 +8,6 @@ cp ./schema_comparator_cli/bin/Release/*  ./vsts_task/GraphqlSchemaComperator/co
 #update version numbers
 bumped release patch
 #build the extension 
-tfx extension create --root ./vsts_task --manifest-globs vss-extension.json --rev-version
-#tfx extension publish --root ./vsts_task --manifest-globs vss-extension.json --rev-version
+tfx extension create --root ./vsts_task --manifest-globs vss-extension.json
+#tfx extension publish --root ./vsts_task --manifest-globs vss-extension.json 
 
