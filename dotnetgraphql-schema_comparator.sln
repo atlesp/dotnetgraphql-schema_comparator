@@ -9,6 +9,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "schema_comparatorTests", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "schema_comparator_cli", "schema_comparator_cli\schema_comparator_cli.csproj", "{8C4A42B7-E841-417D-9AC5-5127BE333E0C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D9677D82-EAF9-4966-BE1F-45E92847408F}"
+	ProjectSection(SolutionItems) = preProject
+		.bumpedrc = .bumpedrc
+		.travis.yml = .travis.yml
+		CHANGELOG.md = CHANGELOG.md
+		README.md = README.md
+		vsts-task-build.sh = vsts-task-build.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
