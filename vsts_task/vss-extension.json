@@ -1,7 +1,7 @@
 {
   "name": "GraphQL Schema Comperator",
   "description": "Tools for building/releasing with Fabrikam. Includes one build/release task.",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "files": [
     {
       "path": "GraphqlSchemaComperator"
