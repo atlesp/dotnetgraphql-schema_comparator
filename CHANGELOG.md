@@ -1,3 +1,10 @@
+<a name="1.2.6"></a>
+## <small>1.2.6 (2018-10-23)</small>
+
+* Fixed more message bugs ([2aa2baa](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/2aa2baa))
+
+
+
 <a name="1.2.5"></a>
 ## <small>1.2.5 (2018-10-23)</small>
 
