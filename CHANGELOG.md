@@ -1,3 +1,10 @@
+<a name="1.2.4"></a>
+## <small>1.2.4 (2018-10-23)</small>
+
+* Fixed null reference in ffield type and argument type  change ([ab3177c](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/ab3177c))
+
+
+
 <a name="1.2.3"></a>
 ## <small>1.2.3 (2018-10-23)</small>
 
