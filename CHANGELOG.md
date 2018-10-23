@@ -1,7 +1,7 @@
 <a name="1.2.5"></a>
 ## <small>1.2.5 (2018-10-23)</small>
 
-
+* Bumped task version number
 
 
 <a name="1.2.4"></a>

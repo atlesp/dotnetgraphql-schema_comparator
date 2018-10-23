@@ -601,7 +601,7 @@ namespace schema_comparator
         }
         protected override string GetMessage()
         {
-            return $"Input field `{objectType}.{oldField.Name}` changed type from `{oldField.Type}` to `{newField.Type}`";
+            return $"Input field `{objectType}.{oldField.Name}` changed type from `{oldField.ResolvedType.Name}` to `{newField.ResolvedType.Name}`";
         }
 
         protected override string GetPath()

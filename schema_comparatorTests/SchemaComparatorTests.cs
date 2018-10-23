@@ -22,7 +22,7 @@ namespace schema_comparator.Tests
         public void type_is_removed()
         {
             Result result = _comperator.Compare("type A { a: String } ", " ");
-            VerfiyChanges(result, typeof(TypeRemovedChange), "A", Criticality.Breaking);
+            VerfiyChanges(result, typeof(TypeRemovedChange), "A", Criticality.Breaking, "Type `A` was removed");
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace schema_comparator.Tests
         {
 
             Result result = _comperator.Compare("", "type A { a: String } ");
-            VerfiyChanges(result, typeof(TypeAddedChange), "A", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(TypeAddedChange), "A", Criticality.NonBreaking, "Type `A` was added");
             
         }
 
@@ -38,7 +38,7 @@ namespace schema_comparator.Tests
         public void type_has_changed_type()
         {
             Result result = _comperator.Compare("type Query { a: A } type A { a: String } ", "type Query { a: A }  enum A { A_VALUE ANOTHER_VALUE } ");
-            VerfiyChanges(result, typeof(TypeKindChanged), "A", Criticality.Breaking);
+            VerfiyChanges(result, typeof(TypeKindChanged), "A", Criticality.Breaking, "`A` kind changed from `ObjectGraphType` to `EnumerationGraphType`");
 
         }
 
@@ -48,7 +48,7 @@ namespace schema_comparator.Tests
         public void type_description_has_changed()
         {
             Result result = _comperator.Compare("#desc " + System.Environment.NewLine + "type A { a: String } ", "#newdesc" + System.Environment.NewLine + "type A { a: String } ");
-            VerfiyChanges(result, typeof(TypeDescriptionChanged), "a", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(TypeDescriptionChanged), "a", Criticality.NonBreaking, "");
             
         }
 
@@ -58,7 +58,7 @@ namespace schema_comparator.Tests
         {
             Result result = _comperator.Compare("enum A { A_VALUE }  ", "enum A { A_VALUE, A_VALUE ANOTHER_VALUE } ");
 
-            VerfiyChanges(result, typeof(EnumValueAdded), "A.ANOTHER_VALUE", Criticality.Dangerous);
+            VerfiyChanges(result, typeof(EnumValueAdded), "A.ANOTHER_VALUE", Criticality.Dangerous, "Enum value `ANOTHER_VALUE` was added to enum `A`");
 
         }
 
@@ -67,8 +67,7 @@ namespace schema_comparator.Tests
         public void enum_value_removed()
         {
             Result result = _comperator.Compare("enum A { A_VALUE,  A_VALUE ANOTHER_VALUE }  ", "enum A { A_VALUE } ");
-            VerfiyChanges(result, typeof(EnumValueRemoved), "A.ANOTHER_VALUE", Criticality.Breaking);
-
+            VerfiyChanges(result, typeof(EnumValueRemoved), "A.ANOTHER_VALUE", Criticality.Breaking, "Enum value `ANOTHER_VALUE` was removed from enum `A`");
         }
 
 
@@ -76,7 +75,7 @@ namespace schema_comparator.Tests
         public void object_type_field_removed()
         {
             Result result = _comperator.Compare("type A { a: String, b:String } ", "type A { a: String }");
-            VerfiyChanges(result, typeof(FieldRemoved), "A.b", Criticality.Breaking);
+            VerfiyChanges(result, typeof(FieldRemoved), "A.b", Criticality.Breaking, "Field `b` was removed from object type `A`");
 
         }
 
@@ -85,7 +84,7 @@ namespace schema_comparator.Tests
         public void object_type_field_added()
         {
             Result result = _comperator.Compare("type A { a: String } ", "type A { a: String, b:String }");
-            VerfiyChanges(result, typeof(FieldAdded), "A.b", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(FieldAdded), "A.b", Criticality.NonBreaking, "Field `b` was added to object type `A`");
 
         }
 
@@ -95,7 +94,7 @@ namespace schema_comparator.Tests
         public void object_type_interface_removed()
         {
             Result result = _comperator.Compare("interface I {a: String} type A implements I { a: String } ", "interface I {a: String} type A { a: String }");
-            VerfiyChanges(result, typeof(ObjectTypeInterfaceRemoved), "A.b", Criticality.Breaking);
+            VerfiyChanges(result, typeof(ObjectTypeInterfaceRemoved), "A.b", Criticality.Breaking, "");
 
         }
 
@@ -105,7 +104,7 @@ namespace schema_comparator.Tests
         public void object_type_interface_added()
         {
             Result result = _comperator.Compare("type A { a: String }", "interface I {a: String} type A implements I { a: String } ");
-            VerfiyChanges(result, typeof(ObjectTypeInterfaceAdded), "A.b", Criticality.Breaking);
+            VerfiyChanges(result, typeof(ObjectTypeInterfaceAdded), "A.b", Criticality.Breaking, "");
             
         }
 
@@ -114,7 +113,7 @@ namespace schema_comparator.Tests
         public void directive_added()
         {
             Result result = _comperator.Compare("", "directive @A ( a: String ) on FIELD_DEFINITION");
-            VerfiyChanges(result, typeof(DirectiveAdded), "A", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(DirectiveAdded), "A", Criticality.NonBreaking, "Directive `A` was added");
             Assert.AreEqual(1, result.changes.Count);
 
         }
@@ -123,7 +122,7 @@ namespace schema_comparator.Tests
         public void directive_removed()
         {
             Result result = _comperator.Compare("directive @A ( a: String ) on FIELD_DEFINITION", "");
-            VerfiyChanges(result, typeof(DirectiveRemoved), "A", Criticality.Breaking);
+            VerfiyChanges(result, typeof(DirectiveRemoved), "A", Criticality.Breaking, "Directive `A` was removed");
 
         }
 
@@ -132,7 +131,7 @@ namespace schema_comparator.Tests
         public void schema_query_changed()
         {
             Result result = _comperator.Compare("schema { query: MyQuery} type MyQuery {} type MyQueryNext {}", "schema { query: MyQueryNext} type MyQuery {}  type MyQueryNext {}");
-            VerfiyChanges(result, typeof(SchemaQueryTypeChanged), "MyQuery", Criticality.Breaking);
+            VerfiyChanges(result, typeof(SchemaQueryTypeChanged), "MyQuery", Criticality.Breaking, "Schema query root has changed from `MyQuery` to `MyQueryNext`");
 
         }
 
@@ -141,7 +140,7 @@ namespace schema_comparator.Tests
         {
             Result result = _comperator.Compare("schema { mutation: MyMutation} type MyMutation {} type MyMutationNext {}", 
                                                 "schema { mutation: MyMutationNext} type MyMutation {}  type MyMutationNext {}");
-            VerfiyChanges(result, typeof(SchemaMutationTypeChanged), "MyMutation", Criticality.Breaking);
+            VerfiyChanges(result, typeof(SchemaMutationTypeChanged), "MyMutation", Criticality.Breaking, "Schema mutation root has changed from `MyMutation` to `MyMutationNext`");
 
         }
 
@@ -150,7 +149,8 @@ namespace schema_comparator.Tests
         {
             Result result = _comperator.Compare("schema { subscription: MySubscription} type MySubscription {} type MySubscriptionNext {}", 
                                                 "schema { subscription: MySubscriptionNext} type MySubscription {}  type MySubscriptionNext {}");
-            VerfiyChanges(result, typeof(SchemaSubscriptionTypeChanged), "MySubscription", Criticality.Breaking);
+            VerfiyChanges(result, typeof(SchemaSubscriptionTypeChanged), "MySubscription",
+                Criticality.Breaking, "Schema subscription type has changed from `MySubscription` to `MySubscriptionNext`");
 
         }
 
@@ -160,7 +160,7 @@ namespace schema_comparator.Tests
         {
             Result result = _comperator.Compare("input MessageInput { content: String}",
                                                 "input MessageInput { content: String, author: String}");
-            VerfiyChanges(result, typeof(InputFieldAdded), "MessageInput.author", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(InputFieldAdded), "MessageInput.author", Criticality.NonBreaking, "Input field `author` was added to input object type `MessageInput`");
             
         }
 
@@ -169,7 +169,7 @@ namespace schema_comparator.Tests
         {
             Result result = _comperator.Compare("input MessageInput { content: String, author: String}",
                                                 "input MessageInput { content: String}");
-            VerfiyChanges(result, typeof(InputFieldRemoved), "MessageInput.author", Criticality.Breaking);
+            VerfiyChanges(result, typeof(InputFieldRemoved), "MessageInput.author", Criticality.Breaking, "Input field `author` was removed from input object type `MessageInput`");
             
         }
 
@@ -179,7 +179,7 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("input MessageInput { content: String}",
                                                 "input MessageInput { content: Boolean}");
 
-            VerfiyChanges(result, typeof(InputFieldTypeChanged), "MessageInput.content", Criticality.Breaking);
+            VerfiyChanges(result, typeof(InputFieldTypeChanged), "MessageInput.content", Criticality.Breaking, "Input field `GraphQL.Types.InputObjectGraphType.content` changed type from `String` to `Boolean`");
 
         }
 
@@ -190,7 +190,8 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("input MessageInput { content: String = \"default\" }",
                                                 "input MessageInput { content: String = \"newdefault\" }");
 
-            VerfiyChanges(result, typeof(InputFieldDefaultChanged), "MessageInput.content", Criticality.Dangerous);
+            VerfiyChanges(result, typeof(InputFieldDefaultChanged), "MessageInput.content", 
+                Criticality.Dangerous, "Input field `MessageInput.content` default changed from `default` to `newdefault`");
             
         }
 
@@ -201,7 +202,7 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("type A { b: String }",
                                                 "type A { b: String @deprecated}");
             
-            VerfiyChanges(result, typeof(FieldDeprecationChanged), "A.b", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(FieldDeprecationChanged), "A.b", Criticality.NonBreaking, "Deprecation reason on field `A.b` has changed from `` to `No longer supported`");
         }
 
 
@@ -214,7 +215,7 @@ namespace schema_comparator.Tests
                 "type Starship {Length(Unit: String): Float}");
 
 
-            VerfiyChanges(result, typeof(FieldDeprecationChanged), "A.b", Criticality.Breaking);
+            VerfiyChanges(result, typeof(FieldDeprecationChanged), "A.b", Criticality.Breaking, "");
         }
 
 
@@ -225,7 +226,7 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: String ): Float }");
 
 
-            VerfiyChanges(result, typeof(FieldArgumentRemoved), "Starship.field.b", Criticality.Breaking);
+            VerfiyChanges(result, typeof(FieldArgumentRemoved), "Starship.field.b", Criticality.Breaking, "Argument `b: ` was removed from field `Starship.field`");
         }
 
 
@@ -235,8 +236,8 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
                 "type Starship { field(a: String, b: String ): Float }");
 
-            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", Criticality.Breaking);
-            Assert.AreEqual("Argument `b: String` added to field `Starship.field`", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", Criticality.Breaking, "Argument `b: String` added to field `Starship.field`");
+            
         }
 
 
@@ -246,7 +247,7 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
                 "type Starship { field(a: String, b: String! ): Float }");
 
-            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", Criticality.NonBreaking, "Argument `b: ` added to field `Starship.field`");
         }
 
 
@@ -256,8 +257,9 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
                 "type Starship { field(a: Float ): Float }");
             
-            VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking);
-            Assert.AreEqual("Type for argument `a` on field `Starship.field` changed from `String` to `Float`", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", 
+                Criticality.Breaking, "Type for argument `a` on field `Starship.field` changed from `String` to `Float`");
+            
         }
 
         [Test]
@@ -265,9 +267,9 @@ namespace schema_comparator.Tests
         {
             Result result = _comperator.Compare("type Starship { field (a: Int = 10): Float }",
                 "type Starship { field(a: Int = 9 ): Float }");
-
-            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
-            Assert.AreEqual("Default value for argument `a` on field `Starship.field` changed from `10` to `9`", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", 
+                Criticality.Dangerous, "Default value for argument `a` on field `Starship.field` changed from `10` to `9`");
+            
         }
 
         [Test]
@@ -277,8 +279,9 @@ namespace schema_comparator.Tests
            var result = _comperator.Compare("type Starship { field (a: Int ): Float}",
                 "type Starship { field(a: Int = 9 ): Float }");
 
-            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
-            Assert.AreEqual("Default value `9` was added to argument `a` on field `Starship.field`", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", 
+                    Criticality.Dangerous, "Default value `9` was added to argument `a` on field `Starship.field`");
+            
         }
 
         [Test]
@@ -288,8 +291,9 @@ namespace schema_comparator.Tests
             var result = _comperator.Compare("type Starship { field (a: Int = 9): Float}",
                 "type Starship { field(a: Int ): Float }");
 
-            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
-            Assert.AreEqual("Default value for argument `a` on field `Starship.field` changed from `9` to ``", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a",
+                Criticality.Dangerous, "Default value for argument `a` on field `Starship.field` changed from `9` to ``");
+            
         }
 
 
@@ -302,8 +306,8 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: String ): Float }");
 
 
-            VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.NonBreaking);
-            Assert.AreEqual("Type for argument `a` on field `Starship.field` changed from `` to `String`", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.NonBreaking, "Type for argument `a` on field `Starship.field` changed from `` to `String`");
+            
         }
 
         [Test]
@@ -313,8 +317,8 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: Int ): Float }");
 
 
-            VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking);
-            Assert.AreEqual("Type for argument `a` on field `Starship.field` changed from `` to `Int`", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking, "Type for argument `a` on field `Starship.field` changed from `` to `Int`");
+            
         }
 
 
@@ -324,9 +328,8 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("type Starship { field : Float}",
                 "type Starship { field : String }");
 
-
-            VerfiyChanges(result, typeof(FieldTypeChanged), "Starship.field", Criticality.Breaking);
-            Assert.AreEqual("Field `GraphQL.Types.ObjectGraphType.field` changed type from `Float` to `String`", result.changes[0].Message);
+            VerfiyChanges(result, typeof(FieldTypeChanged), "Starship.field", Criticality.Breaking, "Field `GraphQL.Types.ObjectGraphType.field` changed type from `Float` to `String`");
+            
         }
 
         [Test]
@@ -336,11 +339,11 @@ namespace schema_comparator.Tests
             Result result = _comperator.Compare("type Starship { field : Float!}",
                 "type Starship { field : Float }");
             
-            VerfiyChanges(result, typeof(FieldTypeChanged), "Starship.field", Criticality.NonBreaking);
+            VerfiyChanges(result, typeof(FieldTypeChanged), "Starship.field", Criticality.NonBreaking, "");
         }
         
 
-        private static void VerfiyChanges(Result result, Type typeOfChange, string path, Criticality criticality)
+        private static void VerfiyChanges(Result result, Type typeOfChange, string path, Criticality criticality, string message)
         {
             Assert.AreEqual(1, result.changes.Count);
             Change change = result.changes[0];
@@ -349,6 +352,8 @@ namespace schema_comparator.Tests
             Assert.AreEqual(criticality == Criticality.Breaking, change.IsBreaking, "Isbreaking was not as expected");
             Assert.AreEqual(criticality == Criticality.Dangerous, change.IsDangerous, "IsDangerous was not as expected");
             Assert.AreEqual(criticality == Criticality.NonBreaking, change.IsNonBreaking, "IsNoneBreaking was not as expected");
+            Assert.AreEqual(message, change.Message);
+            
         }
     }
 }
