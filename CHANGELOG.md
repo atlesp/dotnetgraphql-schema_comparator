@@ -1,3 +1,11 @@
+<a name="1.2.3"></a>
+## <small>1.2.3 (2018-10-23)</small>
+
+* Fixed null object reference bug when argument  was added to a field ([0204eac](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/0204eac))
+* working on auto publish ([8d25664](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/8d25664))
+
+
+
 <a name="1.2.2"></a>
 ## <small>1.2.2 (2018-10-16)</small>
 
