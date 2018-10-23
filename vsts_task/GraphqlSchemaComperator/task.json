@@ -14,7 +14,7 @@
   "version": {
     "Major": "1",
     "Minor": "2",
-    "Patch": "5"
+    "Patch": "8"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "GraphqlSchemaComperator $(message)",
