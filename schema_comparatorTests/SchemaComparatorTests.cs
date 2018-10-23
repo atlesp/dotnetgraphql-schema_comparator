@@ -236,6 +236,7 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: String, b: String ): Float }");
 
             VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", Criticality.Breaking);
+            Assert.AreEqual("Argument `b: String` added to field `Starship.field`", result.changes[0].Message);
         }
 
 

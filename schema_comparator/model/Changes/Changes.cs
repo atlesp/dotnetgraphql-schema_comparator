@@ -530,7 +530,7 @@ namespace schema_comparator
         
     protected override string GetMessage()
         {
-            return $"Argument `{ argument.Name}: { argument.Type.Name}` added to field `{ objectType.Name}.{ oldField.Name}`";
+            return $"Argument `{ argument.Name}: { argument.ResolvedType.Name}` added to field `{ objectType.Name}.{ oldField.Name}`";
         }
 
         protected override string GetPath()

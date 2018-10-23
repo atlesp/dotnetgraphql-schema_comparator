@@ -12,8 +12,8 @@ $env:SYSTEM_CULTURE = "en-US"
 $env:INPUT_GRAPHQLAPINAME   = "MyApi";
 $env:INPUT_FAILBUILDIFAPIBROKEN   = $false;
 
-$env:INPUT_OLDSCHEMA    = "C:\temp\graphql-schemas\graphql-schema-diagnostics.txt";
-$env:INPUT_NEWSCHEMA    = "C:\temp\graphql-schemas\graphql-schema-diagnostics-new.txt";
+$env:INPUT_OLDSCHEMA    = "C:\temp\graphql-schemas\graphql-schema-insight-old.txt";
+$env:INPUT_NEWSCHEMA    = "C:\temp\graphql-schemas\graphql-schema-insight.txt";
 $env:INPUT_SCHEMADIFF   = "C:\temp\graphql-schemas\graphql-schema-diff.json";
 try {
     $debugSlackToken  = Get-Content -Path "$PSScriptRoot/debug-slacktoken.txt"    
