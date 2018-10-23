@@ -257,6 +257,7 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: Float ): Float }");
             
             VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking);
+            Assert.AreEqual("Type for argument `a` on field `Starship.field` changed from `String` to `Float`", result.changes[0].Message);
         }
 
         [Test]
@@ -266,7 +267,7 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: Int = 9 ): Float }");
 
             VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
-
+            Assert.AreEqual("Default value for argument `a` on field `Starship.field` changed from `10` to `9`", result.changes[0].Message);
         }
 
         [Test]
@@ -277,7 +278,7 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: Int = 9 ): Float }");
 
             VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
-
+            Assert.AreEqual("Default value `9` was added to argument `a` on field `Starship.field`", result.changes[0].Message);
         }
 
         [Test]
@@ -288,7 +289,7 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: Int ): Float }");
 
             VerfiyChanges(result, typeof(FieldArgumentDefaultChanged), "Starship.field.a", Criticality.Dangerous);
-
+            Assert.AreEqual("Default value for argument `a` on field `Starship.field` changed from `9` to ``", result.changes[0].Message);
         }
 
 
@@ -302,6 +303,7 @@ namespace schema_comparator.Tests
 
 
             VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.NonBreaking);
+            Assert.AreEqual("Type for argument `a` on field `Starship.field` changed from `` to `String`", result.changes[0].Message);
         }
 
         [Test]
@@ -312,6 +314,7 @@ namespace schema_comparator.Tests
 
 
             VerfiyChanges(result, typeof(FieldArgumentTypeChanged), "Starship.field.a", Criticality.Breaking);
+            Assert.AreEqual("Type for argument `a` on field `Starship.field` changed from `` to `Int`", result.changes[0].Message);
         }
 
 
@@ -323,6 +326,7 @@ namespace schema_comparator.Tests
 
 
             VerfiyChanges(result, typeof(FieldTypeChanged), "Starship.field", Criticality.Breaking);
+            Assert.AreEqual("Field `GraphQL.Types.ObjectGraphType.field` changed type from `Float` to `String`", result.changes[0].Message);
         }
 
         [Test]

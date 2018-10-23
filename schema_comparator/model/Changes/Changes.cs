@@ -672,8 +672,8 @@ namespace schema_comparator
         protected override string GetMessage()
         {
            
-            return $"Type for argument `{ newArgument.Name}` on field `{objectType.Name}.{ oldField.Name}` changed" +
-                        $" from `{oldArgument.Type.Name}` to `{newArgument.Type.Name}`";
+            return $"Type for argument `{ newArgument.Name}` on field `{objectType.Name}.{oldField.Name}` changed" +
+                        $" from `{oldArgument.ResolvedType.Name}` to `{newArgument.ResolvedType.Name}`";
         }
 
         protected override string GetPath()
@@ -710,7 +710,7 @@ namespace schema_comparator
 
         protected override string GetMessage()
         {
-            return $"Field `{objectType}.{oldField.Name}` changed type from `{oldField.Type}` to `{newField.Type}`";
+            return $"Field `{objectType}.{oldField.Name}` changed type from `{oldField.ResolvedType.Name}` to `{newField.ResolvedType.Name}`";
         }
 
         protected override string GetPath()
