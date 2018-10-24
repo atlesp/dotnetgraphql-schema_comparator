@@ -450,7 +450,6 @@ namespace schema_comparator
         }
 
     }
-
     public class FieldDeprecationChanged : Change
     {
         private readonly IGraphType objectType;
@@ -476,16 +475,14 @@ namespace schema_comparator
 
     }
 
-
-
     public class FieldArgumentRemoved : Change
     {
-  
+
         private readonly IGraphType objectType;
         private readonly IFieldType field;
         private readonly QueryArgument argument;
 
-  
+
         public FieldArgumentRemoved(IGraphType objectType, IFieldType field, QueryArgument argument) : base(Criticality.Breaking)
         {
             this.objectType = objectType;
@@ -494,10 +491,9 @@ namespace schema_comparator
 
         }
 
-
         protected override string GetMessage()
         {
-            return $"Argument `{ argument.Name}: { argument.Type}` was removed from field `{ objectType.Name}.{ field.Name}`";
+            return $"Argument `{ argument.Name}:{argument.ResolvedType.Name}` was removed from field `{ objectType.Name}.{ field.Name}`";
         }
 
         protected override string GetPath()
@@ -506,20 +502,19 @@ namespace schema_comparator
             return $"{objectType.Name}.{field.Name}.{argument.Name}";
         }
 
-
     }
 
 
     public class FieldArgumentAdded : Change
     {
-        
+
         private readonly IGraphType objectType;
         private readonly IFieldType oldField;
         private readonly QueryArgument argument;
 
 
-        public FieldArgumentAdded(IGraphType objectType, IFieldType oldField, QueryArgument argument) 
-                : base(argument.ResolvedType is NonNullGraphType ? Criticality.NonBreaking : Criticality.Breaking)
+        public FieldArgumentAdded(IGraphType objectType, IFieldType oldField, QueryArgument argument)
+                : base(argument.ResolvedType is NonNullGraphType ? Criticality.Breaking : Criticality.NonBreaking)
         {
 
             this.objectType = objectType;
@@ -527,10 +522,13 @@ namespace schema_comparator
             this.argument = argument;
 
         }
-        
-    protected override string GetMessage()
+
+        protected override string GetMessage()
         {
-            return $"Argument `{argument.Name}: {argument.ResolvedType.Name}` added to field `{objectType.Name}.{oldField.Name}`";
+            var typename = argument.ResolvedType is NonNullGraphType
+                ? ((NonNullGraphType)argument.ResolvedType).ResolvedType.Name
+                : argument.ResolvedType.Name;
+            return $"Argument `{argument.Name}:{typename}` added to field `{objectType.Name}.{oldField.Name}`";
         }
 
         protected override string GetPath()
@@ -541,8 +539,9 @@ namespace schema_comparator
     }
 
 
-    public class FieldArgumentDefaultChanged : Change { 
-        
+    public class FieldArgumentDefaultChanged : Change
+    {
+
         private readonly IGraphType objectType;
         private readonly IFieldType oldField;
         private readonly QueryArgument oldArgument;
@@ -550,7 +549,7 @@ namespace schema_comparator
 
 
         public FieldArgumentDefaultChanged(IGraphType objectType, IFieldType field,
-                                         QueryArgument oldArgument, QueryArgument newArgument) 
+                                         QueryArgument oldArgument, QueryArgument newArgument)
             : base(Criticality.Dangerous)
         {
             this.objectType = objectType;
@@ -559,10 +558,10 @@ namespace schema_comparator
             this.oldArgument = oldArgument;
             // reason: "Changing the default value for an argument may change the runtime " \
             //"behaviour of a field if it was never provided."
-                
+
         }
 
-        
+
         protected override string GetMessage()
         {
             if (oldArgument.DefaultValue == null)
@@ -581,11 +580,11 @@ namespace schema_comparator
         {
             return $"{objectType.Name}.{oldField.Name}.{oldArgument.Name}";
         }
-        
+
 
     }
 
-    
+
     public class InputFieldTypeChanged : Change
     {
         private readonly IGraphType objectType;
@@ -660,18 +659,18 @@ namespace schema_comparator
             return Criticality.Breaking;
         }
 
-        public FieldArgumentTypeChanged(IGraphType objectType, IFieldType field, QueryArgument oldArgument, QueryArgument newArgument) 
+        public FieldArgumentTypeChanged(IGraphType objectType, IFieldType field, QueryArgument oldArgument, QueryArgument newArgument)
                         : base(getCriticalityLevel(oldArgument, newArgument))
         {
-   
+
             this.objectType = objectType;
             this.oldField = field;
-            this.newArgument= newArgument;
+            this.newArgument = newArgument;
             this.oldArgument = oldArgument;
         }
         protected override string GetMessage()
         {
-           
+
             return $"Type for argument `{ newArgument.Name}` on field `{objectType.Name}.{oldField.Name}` changed" +
                         $" from `{oldArgument.ResolvedType.Name}` to `{newArgument.ResolvedType.Name}`";
         }
@@ -680,16 +679,16 @@ namespace schema_comparator
         {
             return $"{objectType.Name}.{oldField.Name}.{oldArgument.Name}";
         }
-        
+
 
     }
 
 
     public class FieldTypeChanged : Change
     {
-       // include SafeTypeChange
+        // include SafeTypeChange
 
-        
+
         private readonly IGraphType objectType;
         private readonly IFieldType oldField;
         private readonly IFieldType newField;
@@ -706,7 +705,7 @@ namespace schema_comparator
             this.oldField = oldField;
             this.newField = newField;
         }
-        
+
 
         protected override string GetMessage()
         {
@@ -717,7 +716,7 @@ namespace schema_comparator
         {
             return $"{objectType.Name}.{oldField.Name}";
         }
-        
+
     }
 
     /*

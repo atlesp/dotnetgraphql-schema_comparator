@@ -226,7 +226,7 @@ namespace schema_comparator.Tests
                 "type Starship { field(a: String ): Float }");
 
 
-            VerfiyChanges(result, typeof(FieldArgumentRemoved), "Starship.field.b", Criticality.Breaking, "Argument `b: ` was removed from field `Starship.field`");
+            VerfiyChanges(result, typeof(FieldArgumentRemoved), "Starship.field.b", Criticality.Breaking, "Argument `b:String` was removed from field `Starship.field`");
         }
 
 
@@ -234,9 +234,10 @@ namespace schema_comparator.Tests
         public void field_argument_added()
         {
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
-                "type Starship { field(a: String, b: String ): Float }");
+                "type Starship { field(a: String, b: String! ): Float }");
 
-            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", Criticality.Breaking, "Argument `b: String` added to field `Starship.field`");
+            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", 
+                 Criticality.Breaking, "Argument `b:String` added to field `Starship.field`");
             
         }
 
@@ -245,9 +246,10 @@ namespace schema_comparator.Tests
         public void field_nullable_argument_added()
         {
             Result result = _comperator.Compare("type Starship { field (a: String): Float}",
-                "type Starship { field(a: String, b: String! ): Float }");
+                "type Starship { field(a: String, b: String ): Float }");
 
-            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", Criticality.NonBreaking, "Argument `b: ` added to field `Starship.field`");
+            VerfiyChanges(result, typeof(FieldArgumentAdded), "Starship.field.b", 
+                Criticality.NonBreaking, "Argument `b:String` added to field `Starship.field`");
         }
 
 
