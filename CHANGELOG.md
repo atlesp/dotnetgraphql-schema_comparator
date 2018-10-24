@@ -1,3 +1,10 @@
+<a name="1.2.9"></a>
+## <small>1.2.9 (2018-10-24)</small>
+
+* bumped version ([65d9a0d](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/65d9a0d))
+
+
+
 <a name="1.2.8"></a>
 ## <small>1.2.8 (2018-10-23)</small>
 
