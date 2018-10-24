@@ -1,3 +1,12 @@
+<a name="1.2.11"></a>
+## <small>1.2.11 (2018-10-24)</small>
+
+* Added more tests for the change messages and fixed bugs discovered ([2104561](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/2104561))
+* Automated more  of the release process ([f017ab7](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/f017ab7))
+* bumped version ([ea49341](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/ea49341))
+
+
+
 <a name="1.2.9"></a>
 ## <small>1.2.9 (2018-10-24)</small>
 
