@@ -14,25 +14,23 @@
   "version": {
     "Major": "1",
     "Minor": "2",
-    "Patch": "8"
+    "Patch": "10"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "GraphqlSchemaComperator $(message)",
   "groups": [
     {
-        "name": "compare",
-        "displayName": "Compare",
-        "isExpanded": true
+      "name": "compare",
+      "displayName": "Compare",
+      "isExpanded": true
     },
     {
-        "name": "slack",
-        "displayName": "Slack settings",
-        "isExpanded": false
+      "name": "slack",
+      "displayName": "Slack settings",
+      "isExpanded": false
     }
-  ],  
-
+  ],
   "inputs": [
-    
     {
       "name": "graphqlApiName",
       "type": "string",
@@ -104,7 +102,7 @@
       "required": false,
       "helpMarkDown": "The slack boot name to use when posting.",
       "groupName": "slack"
-    }        
+    }
   ],
   "execution": {
     "PowerShell3": {

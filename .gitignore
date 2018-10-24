@@ -335,3 +335,4 @@ ASALocalRun/
 
 *.vsix
 debug-slacktoken.txt
+out
