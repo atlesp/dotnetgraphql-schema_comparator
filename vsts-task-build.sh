@@ -36,6 +36,6 @@ EOF
 sleep 0.5
 
 #build the extension 
-#tfx extension create --root ./vsts_task --manifest-globs vss-extension.json
+tfx extension create --root ./vsts_task --manifest-globs vss-extension.json
 #tfx extension publish --root ./vsts_task --manifest-globs vss-extension.json 
 
