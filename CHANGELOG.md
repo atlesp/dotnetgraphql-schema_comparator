@@ -1,3 +1,12 @@
+<a name="1.2.12"></a>
+## <small>1.2.12 (2018-11-05)</small>
+
+* bumped version ([bfaabbd](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/bfaabbd))
+* exho update url ([15bf5f9](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/15bf5f9))
+* readded the tfs extension create command ([0cc7b23](https://github.com/atlesp/dotnetgraphql-schema_comparator/commit/0cc7b23))
+
+
+
 <a name="1.2.11"></a>
 ## <small>1.2.11 (2018-10-24)</small>
 
