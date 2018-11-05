@@ -39,3 +39,4 @@ sleep 0.5
 tfx extension create --root ./vsts_task --manifest-globs vss-extension.json
 #tfx extension publish --root ./vsts_task --manifest-globs vss-extension.json 
 
+echo "Upload the extension to https://marketplace.visualstudio.com/manage"
